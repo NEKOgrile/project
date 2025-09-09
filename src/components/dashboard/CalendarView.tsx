@@ -4,6 +4,7 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { User, AppSettings, CalendarSlot } from '../../types';
 import { generateCalendarSlots, getMonthName } from '../../utils/calendar';
+import { getUsers, saveUser } from '../../utils/storage';
 import { t } from '../../utils/translations';
 import { supabase } from '../../supabase';
 
@@ -17,48 +18,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ user, settings, currentView
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSlots, setSelectedSlots] = useState<string[]>(() => user.selections || []);
   
-  // allUsers est initialisé depuis Supabase
+  // allUsers est initialisé depuis le localStorage ou le user connecté
   const [allUsers, setAllUsers] = useState<User[]>(() => {
-    return [user];
+    const stored = localStorage.getItem('users');
+    return stored ? JSON.parse(stored) : [user];
   });
 
   const [calendarSlots, setCalendarSlots] = useState<CalendarSlot[]>([]);
-
-  // Charger tous les utilisateurs depuis Supabase au démarrage
-  useEffect(() => {
-    const loadAllUsers = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*');
-
-        if (error) {
-          console.error('Erreur lors du chargement des utilisateurs:', error);
-          return;
-        }
-
-        // Convertir les données Supabase au format User
-        const users: User[] = data.map(dbUser => ({
-          id: dbUser.id,
-          username: dbUser.username,
-          email: dbUser.email,
-          password: dbUser.password,
-          selections: dbUser.available_date || [],
-          createdAt: dbUser.createdat || new Date().toISOString(),
-          available_date: dbUser.available_date || []
-        }));
-
-        setAllUsers(users);
-        
-        // Mettre à jour le localStorage pour la compatibilité
-        localStorage.setItem('users', JSON.stringify(users));
-      } catch (err) {
-        console.error('Erreur lors du chargement des utilisateurs:', err);
-      }
-    };
-
-    loadAllUsers();
-  }, []);
 
   // Recalcule le calendrier à chaque changement de mois ou d'allUsers
 const refreshCalendar = (usersParam?: User[]) => {
@@ -99,6 +65,7 @@ const toggleAvailableDate = (date: string) => {
   setSelectedSlots(newSelections);
 
   const updatedUser = { ...user, selections: newSelections };
+  saveUser(updatedUser);
   localStorage.setItem('currentUser', JSON.stringify(updatedUser));
 
   setAllUsers(prev => {
@@ -113,19 +80,12 @@ const toggleAvailableDate = (date: string) => {
     return newUsers;
   });
 
-  // Appel Supabase pour mettre à jour la base de données
+  // Appel Supabase
   (async () => {
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({ available_date: newSelections })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Erreur lors de la mise à jour des dates:', error);
-      }
-    } catch (err) {
-      console.error('Erreur Supabase:', err);
+    if (isSelected) {
+      await supabase.rpc('remove_available_date', { user_id: user.id, old_date: date });
+    } else {
+      await supabase.rpc('add_available_date', { user_id: user.id, new_date: date });
     }
   })();
 };
