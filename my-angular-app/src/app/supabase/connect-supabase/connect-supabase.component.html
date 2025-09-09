@@ -1,0 +1,17 @@
+<form (ngSubmit)="connectToSupabase()" #supabaseForm="ngForm">
+  <div class="form-group">
+    <label for="url">Supabase URL:</label>
+    <input type="text" id="url" name="url" [(ngModel)]="supabaseUrl" required>
+  </div>
+  
+  <div class="form-group">
+    <label for="key">Supabase Anon Key:</label>
+    <input type="text" id="key" name="key" [(ngModel)]="anonKey" required>
+  </div>
+  
+  <button type="submit" [disabled]="!supabaseForm.valid">Connect</button>
+</form>
+
+<div *ngIf="connectionStatus">
+  <p>{{ connectionStatus }}</p>
+</div>
