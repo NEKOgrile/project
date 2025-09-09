@@ -60,7 +60,19 @@ export const translations: Record<'fr' | 'en', Translation> = {
     'registerError': 'Erreur lors de la création du compte',
     'passwordMismatch': 'Les mots de passe ne correspondent pas',
     'profileUpdated': 'Profil mis à jour avec succès',
-    'settingsUpdated': 'Paramètres sauvegardés'
+    'settingsUpdated': 'Paramètres sauvegardés',
+    'accountDeleted': 'Compte supprimé avec succès',
+    'deleteAccountConfirm': 'Êtes-vous sûr de vouloir supprimer votre compte ?',
+    'deleteAccountWarning': 'Cette action est irréversible et toutes vos données seront perdues.',
+    'currentPassword': 'Mot de passe actuel',
+    'newPassword': 'Nouveau mot de passe',
+    'confirmNewPassword': 'Confirmer le nouveau mot de passe',
+    'passwordTooShort': 'Le mot de passe doit contenir au moins 6 caractères',
+    'incorrectCurrentPassword': 'Mot de passe actuel incorrect',
+    'passwordUpdated': 'Mot de passe mis à jour avec succès',
+    'emailAlreadyExists': 'Cet email est déjà utilisé',
+    'updateError': 'Erreur lors de la mise à jour',
+    'unexpectedError': 'Une erreur inattendue s\'est produite'
   },
   en: {
     // Authentication
@@ -121,7 +133,19 @@ export const translations: Record<'fr' | 'en', Translation> = {
     'registerError': 'Error creating account',
     'passwordMismatch': 'Passwords do not match',
     'profileUpdated': 'Profile updated successfully',
-    'settingsUpdated': 'Settings saved'
+    'settingsUpdated': 'Settings saved',
+    'accountDeleted': 'Account deleted successfully',
+    'deleteAccountConfirm': 'Are you sure you want to delete your account?',
+    'deleteAccountWarning': 'This action is irreversible and all your data will be lost.',
+    'currentPassword': 'Current Password',
+    'newPassword': 'New Password',
+    'confirmNewPassword': 'Confirm New Password',
+    'passwordTooShort': 'Password must be at least 6 characters long',
+    'incorrectCurrentPassword': 'Current password is incorrect',
+    'passwordUpdated': 'Password updated successfully',
+    'emailAlreadyExists': 'This email is already in use',
+    'updateError': 'Error during update',
+    'unexpectedError': 'An unexpected error occurred'
   }
 };
 

@@ -54,6 +54,9 @@ function App() {
   const handleUpdateProfile = (updatedUser: User) => {
     setCurrentUser(updatedUser);
     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    
+    // Émettre un événement pour synchroniser avec les autres composants
+    window.dispatchEvent(new CustomEvent('user:update', { detail: updatedUser }));
   };
 
   const navigateToPage = (page: typeof currentPage) => {
