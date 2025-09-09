@@ -63,55 +63,60 @@ function App() {
     setCurrentPage(page);
   };
 
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case 'login':
-        return (
-          <LoginPage
-            onLogin={handleLogin}
-            onNavigateToRegister={() => navigateToPage('register')}
-            settings={settings}
-          />
-        );
-      case 'register':
-        return (
-          <RegisterPage
-            onRegister={handleLogin}
-            onNavigateToLogin={() => navigateToPage('login')}
-            settings={settings}
-          />
-        );
-      case 'dashboard':
-        return (
-          <Dashboard
-            user={currentUser!}
-            onLogout={handleLogout}
-            onNavigateToProfile={() => navigateToPage('profile')}
-            onNavigateToSettings={() => navigateToPage('settings')}
-            settings={settings}
-          />
-        );
-      case 'profile':
-        return (
-          <ProfilePage
-            user={currentUser!}
-            onUpdateProfile={handleUpdateProfile}
-            onBack={() => navigateToPage('dashboard')}
-            settings={settings}
-          />
-        );
-      case 'settings':
-        return (
-          <SettingsPage
-            settings={settings}
-            onUpdateSettings={handleUpdateSettings}
-            onBack={() => navigateToPage('dashboard')}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+const renderCurrentPage = () => {
+  switch (currentPage) {
+    case 'login':
+      return (
+        <LoginPage
+          onLogin={handleLogin}
+          onNavigateToRegister={() => navigateToPage('register')}
+          settings={settings}
+        />
+      );
+    case 'register':
+      return (
+        <RegisterPage
+          onRegister={handleLogin}
+          onNavigateToLogin={() => navigateToPage('login')}
+          settings={settings}
+        />
+      );
+    case 'dashboard':
+      return currentUser ? (
+        <Dashboard
+          user={currentUser}
+          onLogout={handleLogout}
+          onNavigateToProfile={() => navigateToPage('profile')}
+          onNavigateToSettings={() => navigateToPage('settings')}
+          settings={settings}
+        />
+      ) : (
+        <div>Chargement...</div>
+      );
+    case 'profile':
+      return currentUser ? (
+        <ProfilePage
+          user={currentUser}
+          onUpdateProfile={handleUpdateProfile}
+          onBack={() => navigateToPage('dashboard')}
+          settings={settings}
+        />
+      ) : (
+        <div>Chargement...</div>
+      );
+    case 'settings':
+      return (
+        <SettingsPage
+          settings={settings}
+          onUpdateSettings={handleUpdateSettings}
+          onBack={() => navigateToPage('dashboard')}
+        />
+      );
+    default:
+      return null;
+  }
+};
+
 
   return (
     <div className="min-h-screen">
