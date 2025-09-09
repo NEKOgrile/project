@@ -55,8 +55,8 @@ function App() {
     setCurrentUser(updatedUser);
     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
     
-    // Émettre un événement pour synchroniser avec les autres composants
-    window.dispatchEvent(new CustomEvent('user:update', { detail: updatedUser }));
+    // Recharger la page pour synchroniser toutes les données
+    window.location.reload();
   };
 
   const navigateToPage = (page: typeof currentPage) => {

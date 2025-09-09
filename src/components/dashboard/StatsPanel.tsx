@@ -2,16 +2,15 @@ import React from 'react';
 import { Users, Calendar, CheckSquare } from 'lucide-react';
 import Card from '../ui/Card';
 import { User, AppSettings } from '../../types';
-import { getUsers } from '../../utils/storage';
 import { t } from '../../utils/translations';
 
 interface StatsPanelProps {
   user: User;
   settings: AppSettings;
+  allUsers?: User[];
 }
 
-const StatsPanel: React.FC<StatsPanelProps> = ({ user, settings }) => {
-  const allUsers = getUsers();
+const StatsPanel: React.FC<StatsPanelProps> = ({ user, settings, allUsers = [] }) => {
   const totalSelections = allUsers.reduce((sum, u) => sum + (u.selections?.length || 0), 0);
 
   const stats = [
