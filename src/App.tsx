@@ -14,22 +14,29 @@ function App() {
     theme: 'blue-night'
   });
 
-  // Load user and settings from localStorage on app start
+  // Charger user et settings depuis localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
     const savedSettings = localStorage.getItem('appSettings');
-    
+
     if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-      setCurrentPage('dashboard');
+      try {
+        setCurrentUser(JSON.parse(savedUser));
+        setCurrentPage('dashboard');
+      } catch {
+        setCurrentUser(null);
+        setCurrentPage('login');
+      }
     }
-    
+
     if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
+      try {
+        setSettings(JSON.parse(savedSettings));
+      } catch {}
     }
   }, []);
 
-  // Apply theme to document body
+  // Appliquer le thème
   useEffect(() => {
     document.body.className = `theme-${settings.theme}`;
   }, [settings.theme]);
@@ -54,75 +61,49 @@ function App() {
   const handleUpdateProfile = (updatedUser: User) => {
     setCurrentUser(updatedUser);
     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    
-    // Recharger la page pour synchroniser toutes les données
-    window.location.reload();
   };
 
   const navigateToPage = (page: typeof currentPage) => {
     setCurrentPage(page);
   };
 
-const renderCurrentPage = () => {
-  switch (currentPage) {
-    case 'login':
-      return (
-        <LoginPage
-          onLogin={handleLogin}
-          onNavigateToRegister={() => navigateToPage('register')}
-          settings={settings}
-        />
-      );
-    case 'register':
-      return (
-        <RegisterPage
-          onRegister={handleLogin}
-          onNavigateToLogin={() => navigateToPage('login')}
-          settings={settings}
-        />
-      );
-    case 'dashboard':
-      return currentUser ? (
-        <Dashboard
-          user={currentUser}
-          onLogout={handleLogout}
-          onNavigateToProfile={() => navigateToPage('profile')}
-          onNavigateToSettings={() => navigateToPage('settings')}
-          settings={settings}
-        />
-      ) : (
-        <div>Chargement...</div>
-      );
-    case 'profile':
-      return currentUser ? (
-        <ProfilePage
-          user={currentUser}
-          onUpdateProfile={handleUpdateProfile}
-          onBack={() => navigateToPage('dashboard')}
-          settings={settings}
-        />
-      ) : (
-        <div>Chargement...</div>
-      );
-    case 'settings':
-      return (
-        <SettingsPage
-          settings={settings}
-          onUpdateSettings={handleUpdateSettings}
-          onBack={() => navigateToPage('dashboard')}
-        />
-      );
-    default:
-      return null;
-  }
-};
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case 'login':
+        return <LoginPage onLogin={handleLogin} onNavigateToRegister={() => navigateToPage('register')} settings={settings} />;
+      case 'register':
+        return <RegisterPage onRegister={handleLogin} onNavigateToLogin={() => navigateToPage('login')} settings={settings} />;
+      case 'dashboard':
+        return currentUser ? (
+          <Dashboard
+            user={currentUser}
+            onLogout={handleLogout}
+            onNavigateToProfile={() => navigateToPage('profile')}
+            onNavigateToSettings={() => navigateToPage('settings')}
+            settings={settings}
+          />
+        ) : (
+          <div>Chargement...</div>
+        );
+      case 'profile':
+        return currentUser ? (
+          <ProfilePage
+            user={currentUser}
+            onUpdateProfile={handleUpdateProfile}
+            onBack={() => navigateToPage('dashboard')}
+            settings={settings}
+          />
+        ) : (
+          <div>Chargement...</div>
+        );
+      case 'settings':
+        return <SettingsPage settings={settings} onUpdateSettings={handleUpdateSettings} onBack={() => navigateToPage('dashboard')} />;
+      default:
+        return <div>Page non trouvée</div>;
+    }
+  };
 
-
-  return (
-    <div className="min-h-screen">
-      {renderCurrentPage()}
-    </div>
-  );
+  return <div className="min-h-screen">{renderCurrentPage()}</div>;
 }
 
 export default App;
