@@ -2,132 +2,120 @@
 import { createClient } from '@supabase/supabase-js';
 import { User } from './types';
 
-// ⚠️ Ces valeurs viennent de ton projet Supabase
 const SUPABASE_URL = 'https://tigfgvqiizitwxchhxbz.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpZ2ZndnFpaXppdHd4Y2hoeGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyOTA4NjIsImV4cCI6MjA3MTg2Njg2Mn0.6kQsyzr4xzaQ_qKN9XLEpjYhnmUCv98fYPogWJnUhVI'; // ⚠️ Anon key (fourni dans ton projet)
-
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpZ2ZndnFpaXppdHd4Y2hoeGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyOTA4NjIsImV4cCI6MjA3MTg2Njg2Mn0.6kQsyzr4xzaQ_qKN9XLEpjYhnmUCv98fYPogWJnUhVI'; // garde ta clé
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Normalise une date en YYYY-MM-DD
+function normalizeDate(value: string | Date) {
+  const d = new Date(value);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function mapUserFromDB(u: any): User {
+  const dates = Array.isArray(u.available_date)
+    ? u.available_date.map((d: any) => (typeof d === 'string' ? d : normalizeDate(d)))
+    : [];
+
+  console.log("📦 mapUserFromDB - utilisateur:", u.username, "dates dispo:", dates);
+
+  return {
+    id: u.id,
+    username: u.username,
+    email: u.email ?? '',
+    password: u.password ?? '',
+    available_date: dates,
+    selections: dates,
+    createdAt: u.createdat ?? (u.created_at ?? new Date().toISOString()),
+  };
+}
+
+export async function fetchAllUsers(): Promise<User[]> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, username, email, password, available_date, createdat');
+
+  if (error) {
+    console.error('fetchAllUsers error:', error);
+    throw error;
+  }
+
+  return (data || []).map(mapUserFromDB);
+}
+
+export async function getUserById(userId: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, username, email, password, available_date, createdat')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('getUserById error:', error);
+    return null;
+  }
+
+  return mapUserFromDB(data);
+}
+
 export async function addAvailableDate(userId: string, date: string) {
-  // Récupère l'utilisateur
-  const { data: user, error } = await supabase
+  const newDate = normalizeDate(date);
+  const { data, error } = await supabase
     .from('users')
     .select('available_date')
     .eq('id', userId)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('addAvailableDate - read error:', error);
+    throw error;
+  }
 
-  // Ajoute la nouvelle date (évite les doublons)
-  const dates = user?.available_date || [];
-  if (dates.includes(date)) return dates;
+  const dates = Array.isArray(data?.available_date) ? data.available_date.map((d: any) => String(d)) : [];
+  if (dates.includes(newDate)) return dates;
 
-  const newDates = [...dates, date];
-
-  // Met à jour en BDD
+  const updated = [...dates, newDate];
   const { error: updateError } = await supabase
     .from('users')
-    .update({ available_date: newDates })
+    .update({ available_date: updated })
     .eq('id', userId);
 
-  if (updateError) throw updateError;
+  if (updateError) {
+    console.error('addAvailableDate - update error:', updateError);
+    throw updateError;
+  }
 
-  return newDates;
+  return updated;
 }
 
-// Fonctions utilitaires pour la gestion des utilisateurs
-export async function getUserById(userId: string): Promise<User | null> {
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
+export async function removeAvailableDate(userId: string, date: string) {
+  const removeDate = normalizeDate(date);
+  const { data, error } = await supabase
+    .from('users')
+    .select('available_date')
+    .eq('id', userId)
+    .single();
 
-    if (error) {
-      console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-      return null;
-    }
-
-    return {
-      ...data,
-      selections: data.available_date || []
-    };
-  } catch (err) {
-    console.error('Erreur:', err);
-    return null;
+  if (error) {
+    console.error('removeAvailableDate - read error:', error);
+    throw error;
   }
-}
 
-export async function updateUserProfile(userId: string, updates: Partial<User>): Promise<User | null> {
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .update({
-        username: updates.username,
-        email: updates.email,
-        password: updates.password,
-        available_date: updates.selections
-      })
-      .eq('id', userId)
-      .select()
-      .single();
+  const dates = Array.isArray(data?.available_date) ? data.available_date.map((d: any) => String(d)) : [];
+  const updated = dates.filter(d => d !== removeDate);
 
-    if (error) {
-      console.error('Erreur lors de la mise à jour:', error);
-      return null;
-    }
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ available_date: updated })
+    .eq('id', userId);
 
-    return {
-      ...data,
-      selections: data.available_date || []
-    };
-  } catch (err) {
-    console.error('Erreur:', err);
-    return null;
+  if (updateError) {
+    console.error('removeAvailableDate - update error:', updateError);
+    throw updateError;
   }
-}
 
-export async function deleteUser(userId: string): Promise<boolean> {
-  try {
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', userId);
-
-    if (error) {
-      console.error('Erreur lors de la suppression:', error);
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error('Erreur:', err);
-    return false;
-  }
-}
-
-export async function checkEmailExists(email: string, excludeUserId?: string): Promise<boolean> {
-  try {
-    let query = supabase
-      .from('users')
-      .select('id')
-      .eq('email', email);
-
-    if (excludeUserId) {
-      query = query.neq('id', excludeUserId);
-    }
-
-    const { data, error } = await query.maybeSingle();
-
-    if (error) {
-      console.error('Erreur lors de la vérification de l\'email:', error);
-      return false;
-    }
-
-    return !!data;
-  } catch (err) {
-    console.error('Erreur:', err);
-    return false;
-  }
+  return updated;
 }

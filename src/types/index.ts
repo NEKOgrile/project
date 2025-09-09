@@ -3,11 +3,11 @@ export interface User {
   username: string;
   email: string;
   password: string;
+  available_date?: string[];
   selections: string[];
   createdAt: string;
-  available_date?: string[]; // <-- Ajoute cette ligne
-
 }
+
 
 export interface AppSettings {
   language: 'fr' | 'en';

@@ -64,7 +64,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ user, settings, allUsers = [] }
         })}
       </div>
 
-      {/* Recent Activity */}
+      {/* Activité récente */}
       <Card className="hidden lg:block">
         <h4 className="text-white font-medium mb-3">Activité récente</h4>
         <div className="space-y-2 text-sm">
