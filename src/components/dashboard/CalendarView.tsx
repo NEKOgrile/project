@@ -301,24 +301,24 @@ const CalendarView: React.FC<CalendarViewProps> = ({
           {getMonthName(currentDate.getMonth() + 1, settings.language)}{" "}
           {currentDate.getFullYear()}
         </h2>
-        <div className="flex items-center space-x-1 sm:space-x-2">
+        <div className="flex items-center space-x-2">
           <Button
             variant="secondary"
             size="sm"
             onClick={() => navigateMonth("prev")}
-            className="px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base whitespace-nowrap"
+            className="flex items-center px-3 py-2 text-sm whitespace-nowrap min-w-0"
           >
-            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline ml-1">Précédent</span>
+            <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden sm:inline ml-1 flex-shrink-0">Précédent</span>
           </Button>
           <Button
             variant="secondary"
             size="sm"
             onClick={() => navigateMonth("next")}
-            className="px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base whitespace-nowrap"
+            className="flex items-center px-3 py-2 text-sm whitespace-nowrap min-w-0"
           >
-            <span className="hidden sm:inline mr-1">Suivant</span>
-            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline mr-1 flex-shrink-0">Suivant</span>
+            <ChevronRight className="w-4 h-4 flex-shrink-0" />
           </Button>
         </div>
       </div>

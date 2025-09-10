@@ -63,6 +63,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <StatsPanel
               user={user}
               settings={settings}
+              key={`${user.id}-${user.selections?.length || 0}`}
             />
           </div>
         </div>
@@ -72,6 +73,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <StatsPanel
             user={user}
             settings={settings}
+            key={`mobile-${user.id}-${user.selections?.length || 0}`}
           />
         </div>
       </div>
