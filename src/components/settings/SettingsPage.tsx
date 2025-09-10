@@ -77,21 +77,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                     <span className="text-white font-medium">Français</span>
                   </div>
                 </label>
-                
-                <label className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
-                  <input
-                    type="radio"
-                    name="language"
-                    value="en"
-                    checked={formData.language === 'en'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value as 'fr' | 'en' }))}
-                    className="text-cyan-500 focus:ring-cyan-500"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">🇺🇸</span>
-                    <span className="text-white font-medium">English</span>
-                  </div>
-                </label>
               </div>
             </div>
           </Card>

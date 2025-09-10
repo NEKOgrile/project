@@ -22,7 +22,6 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'home' | 'calendar' | 'statistics'>('calendar');
-  const [allUsers, setAllUsers] = useState<User[]>([user]);
 
   return (
     <div className="min-h-screen flex">
@@ -64,7 +63,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             <StatsPanel
               user={user}
               settings={settings}
-              allUsers={allUsers}
             />
           </div>
         </div>
@@ -74,7 +72,6 @@ const Dashboard: React.FC<DashboardProps> = ({
           <StatsPanel
             user={user}
             settings={settings}
-            allUsers={allUsers}
           />
         </div>
       </div>
