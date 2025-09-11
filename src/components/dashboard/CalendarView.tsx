@@ -476,7 +476,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                       </Card>
 
                       {/* Popup d'appui prolongé pour mobile */}
-                      {longPressSlot === slot.id && usersForSlot.length > 1 && (
+                      {longPressSlot === slot.id && (
                         <div className="sm:hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={closeLongPress}>
                           <div 
                             className="bg-gray-800 rounded-lg p-4 m-4 max-w-xs w-full shadow-xl border border-gray-600"
