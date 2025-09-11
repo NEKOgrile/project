@@ -476,36 +476,37 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                       </Card>
 
                       {/* Popup d'appui prolongé pour mobile */}
-                      {longPressSlot === slot.id && (
-                        <div className="sm:hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={closeLongPress}>
-                          <div 
-                            className="bg-gray-800 rounded-lg p-4 m-4 max-w-xs w-full shadow-xl border border-gray-600"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <div className="text-center mb-3">
-                              <div className="text-lg font-bold text-white mb-1">
-                                {slot.day} {getMonthName(slot.month, settings.language)}
-                              </div>
-                              <div className="text-sm text-gray-300">
-                                {usersForSlot.length} {usersForSlot.length === 1 ? "personne" : "personnes"}
-                              </div>
-                            </div>
-                            <div className="space-y-2 max-h-60 overflow-y-auto">
-                              {usersForSlot.map((u) => (
-                                <div key={u.id} className="bg-cyan-500/20 text-cyan-300 px-3 py-2 rounded-lg text-center border border-cyan-500/30">
-                                  {u.username}
-                                </div>
-                              ))}
-                            </div>
-                            <button 
-                              onClick={closeLongPress}
-                              className="w-full mt-4 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors"
-                            >
-                              Fermer
-                            </button>
-                          </div>
-                        </div>
-                      )}
+{longPressSlot === slot.id && (
+  <div className="sm:hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={closeLongPress}>
+    <div 
+      className="bg-gray-800 rounded-lg p-4 m-4 max-w-xs w-full shadow-xl border border-gray-600"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="text-center mb-3">
+        <div className="text-lg font-bold text-white mb-1">
+          {slot.day} {getMonthName(slot.month, settings.language)}
+        </div>
+        <div className="text-sm text-gray-300">
+          {usersForSlot.length} {usersForSlot.length === 1 ? "personne" : "personnes"}
+        </div>
+      </div>
+      <div className="space-y-2 max-h-60 overflow-y-auto">
+        {usersForSlot.map((u) => (
+          <div key={u.id} className="bg-cyan-500/20 text-cyan-300 px-3 py-2 rounded-lg text-center border border-cyan-500/30">
+            {u.username}
+          </div>
+        ))}
+      </div>
+      <button 
+        onClick={closeLongPress}
+        className="w-full mt-4 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors"
+      >
+        Fermer
+      </button>
+    </div>
+  </div>
+)}
+
                     </div>
                   );
                 })}
