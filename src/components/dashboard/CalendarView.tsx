@@ -169,8 +169,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
   // Gestion de l'appui prolongé
   const handleTouchStart = (slotId: string, usersCount: number) => {
-    if (usersCount <= 1) return; // Pas besoin d'appui prolongé pour 0 ou 1 utilisateur
-    
+    if (usersCount === 0) return; // Pas d'action si personne n'a cliqué    
     const timer = setTimeout(() => {
       setLongPressSlot(slotId);
     }, 500); // 500ms pour déclencher l'appui prolongé
