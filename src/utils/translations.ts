@@ -73,6 +73,12 @@ export const translations: Record<'fr' | 'en', Translation> = {
     'emailAlreadyExists': 'Cet email est déjà utilisé',
     'updateError': 'Erreur lors de la mise à jour',
     'unexpectedError': 'Une erreur inattendue s\'est produite'
+    'filter': 'Filtre',
+    'mostPopular': 'Plus populaire',
+    'selectAll': 'Tout sélectionner',
+    'deselectAll': 'Tout désélectionner',
+    'usersVisible': 'utilisateurs visibles',
+    'filterUsers': 'Filtrer les utilisateurs'
   },
   en: {
     // Authentication
@@ -146,6 +152,12 @@ export const translations: Record<'fr' | 'en', Translation> = {
     'emailAlreadyExists': 'This email is already in use',
     'updateError': 'Error during update',
     'unexpectedError': 'An unexpected error occurred'
+    'filter': 'Filter',
+    'mostPopular': 'Most popular',
+    'selectAll': 'Select all',
+    'deselectAll': 'Deselect all',
+    'usersVisible': 'users visible',
+    'filterUsers': 'Filter users'
   }
 };
 

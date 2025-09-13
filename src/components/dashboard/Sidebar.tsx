@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Calendar, BarChart3, Settings, X } from 'lucide-react';
+import { Home, Calendar, BarChart3, Settings, X, Filter } from 'lucide-react';
 import { User, AppSettings } from '../../types';
 import { t } from '../../utils/translations';
 import { cn } from '../../utils/cn';
@@ -7,7 +7,7 @@ import { cn } from '../../utils/cn';
 interface SidebarProps {
   user: User;
   currentView: 'home' | 'calendar' | 'statistics';
-  onViewChange: (view: 'home' | 'calendar' | 'statistics') => void;
+  onViewChange: (view: 'home' | 'calendar' | 'statistics' | 'filter') => void;
   isOpen: boolean;
   onClose: () => void;
   settings: AppSettings;
@@ -26,6 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: 'home', icon: Home, label: t('home', settings.language) },
     { id: 'calendar', icon: Calendar, label: t('calendar', settings.language) },
     { id: 'statistics', icon: BarChart3, label: t('statistics', settings.language) },
+    { id: 'filter', icon: Filter, label: 'Filtre' },
   ];
 
   return (

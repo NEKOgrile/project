@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Calendar, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Users, Filter } from "lucide-react";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { User, AppSettings, CalendarSlot } from "../../types";
@@ -15,6 +15,7 @@ interface CalendarViewProps {
   user: User;
   settings: AppSettings;
   currentView: "home" | "calendar" | "statistics";
+  onNavigateToFilter?: () => void;
 }
 
 // Normalise une date au format YYYY-MM-DD
@@ -30,14 +31,18 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   user,
   settings,
   currentView,
+  onNavigateToFilter,
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [calendarSlots, setCalendarSlots] = useState<CalendarSlot[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [longPressSlot, setLongPressSlot] = useState<string | null>(null);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [userFilters, setUserFilters] = useState<string[]>([]);
+  const [mostPopularDate, setMostPopularDate] = useState<string | null>(null);
 
   // --- Fetch utilisateurs depuis Supabase ---
   const fetchUsersFromDB = async () => {
@@ -54,14 +59,51 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
       const currentUser = normalized.find((u) => u.id === user.id);
       setSelectedSlots(currentUser?.selections || []);
+      
+      // Initialiser les filtres avec tous les utilisateurs
+      if (userFilters.length === 0) {
+        setUserFilters(normalized.map(u => u.id));
+      }
     } catch (err) {
       console.error("Erreur fetchAllUsers:", err);
     }
   };
 
+  // --- Mise à jour des utilisateurs filtrés ---
+  useEffect(() => {
+    const filtered = allUsers.filter(u => userFilters.includes(u.id));
+    setFilteredUsers(filtered);
+  }, [allUsers, userFilters]);
+
+  // --- Calcul de la date la plus populaire ---
+  useEffect(() => {
+    const dateCounts: Record<string, number> = {};
+    
+    // Compter les sélections par date (en utilisant les utilisateurs filtrés)
+    filteredUsers.forEach(u => {
+      u.selections.forEach(date => {
+        dateCounts[date] = (dateCounts[date] || 0) + 1;
+      });
+    });
+
+    // Trouver la date avec le plus de sélections
+    let maxCount = 0;
+    let popularDate = null;
+    
+    Object.entries(dateCounts).forEach(([date, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        popularDate = date;
+      }
+    });
+
+    // Mettre en évidence seulement si significativement plus populaire (7+ sélections)
+    setMostPopularDate(maxCount >= 7 ? popularDate : null);
+  }, [filteredUsers]);
+
   // --- Génération du calendrier avec assignation des users ---
-  const refreshCalendar = (usersParam?: User[]) => {
-    const usersToUse = usersParam || allUsers;
+  const refreshCalendar = () => {
+    const usersToUse = filteredUsers.length > 0 ? filteredUsers : allUsers;
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
 
@@ -92,7 +134,24 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
   useEffect(() => {
     refreshCalendar();
-  }, [currentDate, settings.language, allUsers]);
+  }, [currentDate, settings.language, filteredUsers]);
+
+  // --- Gestion des filtres utilisateurs ---
+  const toggleUserFilter = (userId: string) => {
+    setUserFilters(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const selectAllUsers = () => {
+    setUserFilters(allUsers.map(u => u.id));
+  };
+
+  const deselectAllUsers = () => {
+    setUserFilters([]);
+  };
 
   // --- Navigation calendrier ---
   const navigateMonth = (direction: "prev" | "next") => {
@@ -370,9 +429,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                   const isToday =
                     new Date().toDateString() ===
                     new Date(slot.year, slot.month - 1, slot.day).toDateString();
+                  const isMostPopular = mostPopularDate === slot.id;
 
                   // ⚡ recalcul immédiat des utilisateurs pour ce slot
-                  const usersForSlot = allUsers.filter((u) =>
+                  const usersForSlot = filteredUsers.filter((u) =>
                     u.selections.includes(slot.id)
                   );
 
@@ -393,7 +453,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                       <Card
                         className={`h-full p-2 sm:p-2 lg:p-3 relative group cursor-pointer transition-all duration-300 ${
                           !isCurrentMonth ? "opacity-40" : ""
-                        } ${isToday ? "ring-2 ring-yellow-400/50" : ""}`}
+                        } ${isToday ? "ring-2 ring-yellow-400/50" : ""} ${
+                          isMostPopular ? "ring-4 ring-orange-500 shadow-lg shadow-orange-500/50 bg-orange-500/10" : ""
+                        }`}
                         selected={isSelected}
                         onClick={handleSlotClick}
                         hover={isCurrentMonth}
@@ -402,10 +464,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                           {/* Numéro du jour */}
                           <div
                             className={`text-sm sm:text-lg lg:text-xl font-bold mb-1 sm:mb-2 ${
-                              isToday ? "text-yellow-400" : "text-white"
+                              isToday ? "text-yellow-400" : 
+                              isMostPopular ? "text-orange-400" : "text-white"
                             }`}
                           >
                             {slot.day}
+                            {isMostPopular && (
+                              <span className="ml-1 text-orange-400 text-xs">🔥</span>
+                            )}
                           </div>
 
                           {/* Affichage des utilisateurs */}
