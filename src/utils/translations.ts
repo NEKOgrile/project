@@ -72,7 +72,7 @@ export const translations: Record<'fr' | 'en', Translation> = {
     'passwordUpdated': 'Mot de passe mis à jour avec succès',
     'emailAlreadyExists': 'Cet email est déjà utilisé',
     'updateError': 'Erreur lors de la mise à jour',
-    'unexpectedError': 'Une erreur inattendue s\'est produite'
+    'unexpectedError': 'Une erreur inattendue s\'est produite',
     'filter': 'Filtre',
     'mostPopular': 'Plus populaire',
     'selectAll': 'Tout sélectionner',
@@ -151,7 +151,7 @@ export const translations: Record<'fr' | 'en', Translation> = {
     'passwordUpdated': 'Password updated successfully',
     'emailAlreadyExists': 'This email is already in use',
     'updateError': 'Error during update',
-    'unexpectedError': 'An unexpected error occurred'
+    'unexpectedError': 'An unexpected error occurred',
     'filter': 'Filter',
     'mostPopular': 'Most popular',
     'selectAll': 'Select all',
