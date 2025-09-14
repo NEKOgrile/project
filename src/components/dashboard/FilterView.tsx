@@ -20,32 +20,7 @@ const FilterView: React.FC<FilterViewProps> = ({
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Charger tous les utilisateurs
-  useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        const users = await fetchAllUsers();
-        setAllUsers(users);
-        // Par défaut, tous les utilisateurs sont sélectionnés
-        setSelectedUsers(users.map(u => u.id));
-      } catch (error) {
-        console.error('Erreur lors du chargement des utilisateurs:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUsers();
-  }, []);
-
-  // Sauvegarder les filtres dans localStorage
-  useEffect(() => {
-    if (selectedUsers.length > 0) {
-      localStorage.setItem('userFilters', JSON.stringify(selectedUsers));
-    }
-  }, [selectedUsers]);
-
-  // Charger les filtres depuis localStorage
+  // Charger les filtres depuis localStorage au démarrage
   useEffect(() => {
     const savedFilters = localStorage.getItem('userFilters');
     if (savedFilters) {
@@ -57,6 +32,35 @@ const FilterView: React.FC<FilterViewProps> = ({
       }
     }
   }, []);
+
+  // Charger tous les utilisateurs
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const users = await fetchAllUsers();
+        setAllUsers(users);
+        
+        // Si aucun filtre sauvegardé, sélectionner tous les utilisateurs
+        const savedFilters = localStorage.getItem('userFilters');
+        if (!savedFilters) {
+          setSelectedUsers(users.map(u => u.id));
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des utilisateurs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
+
+  // Sauvegarder les filtres dans localStorage à chaque changement
+  useEffect(() => {
+    if (selectedUsers.length >= 0) {
+      localStorage.setItem('userFilters', JSON.stringify(selectedUsers));
+    }
+  }, [selectedUsers]);
 
   const toggleUser = (userId: string) => {
     setSelectedUsers(prev => 

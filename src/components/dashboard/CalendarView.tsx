@@ -44,6 +44,26 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const [userFilters, setUserFilters] = useState<string[]>([]);
   const [mostPopularDate, setMostPopularDate] = useState<string | null>(null);
 
+  // Charger les filtres depuis localStorage au démarrage
+  useEffect(() => {
+    const savedFilters = localStorage.getItem('userFilters');
+    if (savedFilters) {
+      try {
+        const filters = JSON.parse(savedFilters);
+        setUserFilters(filters);
+      } catch (error) {
+        console.error('Erreur lors du chargement des filtres:', error);
+      }
+    }
+  }, []);
+
+  // Sauvegarder les filtres dans localStorage
+  useEffect(() => {
+    if (userFilters.length > 0) {
+      localStorage.setItem('userFilters', JSON.stringify(userFilters));
+    }
+  }, [userFilters]);
+
   // --- Fetch utilisateurs depuis Supabase ---
   const fetchUsersFromDB = async () => {
     try {
@@ -97,13 +117,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       }
     });
 
-    // Mettre en évidence seulement si significativement plus populaire (7+ sélections)
-    setMostPopularDate(maxCount >= 7 ? popularDate : null);
+    // Mettre en évidence seulement si significativement plus populaire (3+ sélections)
+    setMostPopularDate(maxCount >= 3 ? popularDate : null);
   }, [filteredUsers]);
 
   // --- Génération du calendrier avec assignation des users ---
   const refreshCalendar = () => {
-    const usersToUse = filteredUsers.length > 0 ? filteredUsers : allUsers;
+    const usersToUse = filteredUsers;
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
 
@@ -134,7 +154,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
   useEffect(() => {
     refreshCalendar();
-  }, [currentDate, settings.language, filteredUsers]);
+  }, [currentDate, settings.language, filteredUsers, allUsers]);
 
   // --- Gestion des filtres utilisateurs ---
   const toggleUserFilter = (userId: string) => {
