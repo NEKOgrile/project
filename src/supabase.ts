@@ -67,7 +67,7 @@ export async function addAvailableDate(userId: string, date: string) {
     .from('users')
     .select('available_date')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('addAvailableDate - read error:', error);
@@ -97,7 +97,7 @@ export async function removeAvailableDate(userId: string, date: string) {
     .from('users')
     .select('available_date')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('removeAvailableDate - read error:', error);
